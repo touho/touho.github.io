@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" href="WikiRock-logo-small.png">
+    <meta property="og:image" content="kitt_preview.png" />
 </head>
 <script src="redom.js"></script>
 <style>
@@ -70,8 +71,8 @@
 <script>
     let {el, mount} = redom;
     const LIGHT_COUNT = 8;
-    const SPEED = 3;
     const LOOP_TIME = 2;
+    const REQUIRE_KEY_START = false;
     
 	class Light {
 		constructor(index) {
@@ -120,17 +121,31 @@
 		}
     }
     
+    let startSeconds = 0;
     function loop() {
-    	let t = performance.now() / 1000;
+    	let t = (performance.now() - startSeconds) / 1000;
     	let pos = t % LOOP_TIME;
     	if (pos > LOOP_TIME / 2) {
     		pos = LOOP_TIME - pos;
         }
+        
+        pos /= LOOP_TIME / 2;
 //    	let pos = 0.5 + 0.5 * Math.sin(t * SPEED);
     	setLightPosition(pos);
     }
     
-    setInterval(loop, 50);
+    let running = false;
+    if (!REQUIRE_KEY_START) {
+		setInterval(loop, 50);
+		startSeconds = performance.now();
+		running = true;
+	}
+    
+    if (REQUIRE_KEY_START) {
+    	lights.forEach(light => {
+    		light.el.style.opacity = 0;
+        });
+    }
     
     
     
@@ -154,7 +169,14 @@
 		window.onwheel = preventDefault; // modern standard
 		window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
 		window.ontouchmove  = preventDefault; // mobile
-		document.onkeydown  = preventDefaultForScrollKeys;
+		document.onkeydown  = () => {
+			if (!running && REQUIRE_KEY_START) {
+				startSeconds = performance.now();
+				running = true;
+				setInterval(loop, 50);
+            }
+			preventDefaultForScrollKeys();
+        };
 	}
 	disableScroll();
 </script>
