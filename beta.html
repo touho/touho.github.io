@@ -1,0 +1,222 @@
+<html>
+<head>
+    <title>KITT</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable = no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" href="WikiRock-logo-small.png">
+</head>
+<script src="redom.js"></script>
+<style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    html {
+        background: black;
+    }
+    
+    #container {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        height: 6%;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        transform: translateY(-50%);
+        padding: 0 2% 0 2%;
+        box-sizing: border-box;
+    }
+    .light {
+        flex: 1;
+        margin: 1%;
+        margin-top: 0;
+        margin-bottom: 0;
+        height: 100%;
+        background: #ff3840;
+        display: inline-block;
+        /*box-shadow: 0 0 50px 30px red, 0 0 142px 59px rgba(255, 0, 0, 0.4);*/
+        box-shadow: 0 0 3vw 1vw rgba(255, 0, 0, 0.67);
+        opacity: 1;
+        border-radius: 3%;
+        position: relative;
+    }
+    .lightCenter {
+        width: 0;
+        height: 0;
+        /*background: rgba(255, 255, 255, 0.8);*/
+        background: transparent;
+        box-shadow: 0 0 4vh 2.5vh rgba(255, 255, 255, 1), 0 0 9vh 7vh rgba(255, 255, 255, 0.3), 0 0 15vw 8vw rgba(255, 0, 0, 0.2);
+        border-radius: 10%;
+        /*box-shadow: 0 0 50px 30px red, 0 0 142px 59px rgba(255, 0, 0, 0.4);*/
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+
+
+
+    #julkaisu {
+        position: relative;
+        text-align: center;
+        font-family: Arial;
+        font-size: 14px;
+        letter-spacing: 4px;
+        top: 30%;
+        color: #e46969;
+    }
+</style>
+<body>
+
+<div id="julkaisu">
+    SEURAAVAAN JULKAISUUN:<br>
+    <div id="counter">
+    </div>
+
+    <script>
+        let publishTime = new Date('2018-05-03T17:00:00.000Z');
+         publishTime = new Date('2018-04-24T18:15:00.000Z');
+        function updateTime() {
+            let diffMilliseconds = publishTime - new Date();
+            let secs = (diffMilliseconds / 1000 | 0) + 1;
+
+            let isInFuture = secs >= 0;
+
+            let mins = secs / 60 | 0;
+            secs -= mins * 60;
+
+            let hours = mins / 60 | 0;
+            mins -= hours * 60;
+
+            let days = hours / 24 | 0;
+            hours -= days * 24;
+
+            let strings = [];
+            days > 0 && strings.push(days + ' päivää');
+            hours > 0 && strings.push(hours + ' tuntia');
+            mins > 0 && strings.push(mins + ' minuuttia');
+            secs >= 0 && strings.push(secs + ' sekuntia');
+
+            if (isInFuture) {
+                counter.innerHTML = strings.join(' ');
+            } else {
+                counter.innerHTML = 'Sori, unohdin päivittää. Laita face viesti WikiRock kanavalle. :D';
+            }
+        }
+        updateTime();
+
+        let timeout = 1000 - new Date().getMilliseconds() + 10;
+        if (timeout > 1000)
+            timeout -= 1000;
+        setTimeout(() => {
+            setInterval(updateTime, 1000);
+            updateTime();
+        }, timeout);
+    </script>
+</div>
+
+<div id="container">
+
+</div>
+
+</body>
+
+<script>
+    let {el, mount} = redom;
+    const LIGHT_COUNT = 8;
+    const SPEED = 3;
+    const LOOP_TIME = 2;
+    
+	class Light {
+		constructor(index) {
+			this.redValue = 0;
+			this.whiteValue = 0;
+			this.index = index;
+			this.el = el('div.light',
+                this.center = el('div.lightCenter')
+			);
+		}
+		setLightPosition(value) {
+			let index = value * (LIGHT_COUNT) | 0;
+			let distance = Math.abs(value - this.position);
+			if (index === this.index) {
+				this.redValue = 1;
+				this.whiteValue = 1;
+			} else {
+				this.redValue = Math.max(0.05, this.redValue -= 0.065);
+				this.whiteValue = Math.max(0, this.whiteValue -= 0.2);
+			}
+
+			this.el.style.opacity = Math.min(1, this.redValue * 2);
+			this.center.style.opacity = Math.min(0.8, this.whiteValue * 1.3);
+			
+			/*
+			this.el.style.opacity = Math.max(1 - distance * 1.2, 0);
+			this.center.style.opacity = Math.max(1 - distance * 3, 0);
+			*/
+        }
+		update(data) {
+		}
+	}
+	
+	let lights = [];
+	
+    for (let i = 0; i < LIGHT_COUNT; ++i) {
+		let light = new Light(i);
+		lights.push(light);
+        redom.mount(container, light);
+    }
+    
+    // 0 to 1
+    function setLightPosition(value) {
+		for (let i = 0; i < LIGHT_COUNT; ++i) {
+			lights[i].setLightPosition(value);
+		}
+    }
+    
+    function loop() {
+    	let t = performance.now() / 1000;
+    	let pos = t % LOOP_TIME;
+    	if (pos > LOOP_TIME / 2) {
+    		pos = LOOP_TIME - pos;
+        }
+//    	let pos = 0.5 + 0.5 * Math.sin(t * SPEED);
+    	setLightPosition(pos);
+    }
+    
+    setInterval(loop, 50);
+    
+    
+    
+    // Disable scroll
+	var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+	function preventDefault(e) {
+		e = e || window.event;
+		if (e.preventDefault)
+			e.preventDefault();
+		e.returnValue = false;
+	}
+	function preventDefaultForScrollKeys(e) {
+		if (keys[e.keyCode]) {
+			preventDefault(e);
+			return false;
+		}
+	}
+	function disableScroll() {
+		if (window.addEventListener) // older FF
+			window.addEventListener('DOMMouseScroll', preventDefault, false);
+		window.onwheel = preventDefault; // modern standard
+		window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+		window.ontouchmove  = preventDefault; // mobile
+		document.onkeydown  = preventDefaultForScrollKeys;
+	}
+	disableScroll();
+    
+</script>
+</html>
