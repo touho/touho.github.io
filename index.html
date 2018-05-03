@@ -83,7 +83,7 @@
 
     <script>
         let publishTime = new Date('2018-05-03T17:00:00.000Z');
-        //publishTime = new Date(Date.now() + 2000);
+         //publishTime = new Date(Date.now() + 2000);
          //publishTime = new Date('2018-04-24T18:15:00.000Z');
         function updateTime() {
             let diffMilliseconds = publishTime - new Date();
@@ -111,7 +111,7 @@
             } else {
                 julkaisuun.textContent = 'OLKAA HYVÄT:';
                 counter.classList.add('published');
-                counter.innerHTML = '<a href="./index.html">Ritari Ässä -musavideo (päivitä sivu)</a>';
+                counter.innerHTML = '<b><a href="https://youtu.be/NcC_ILexrr4">Ritari Ässä -musavideo</a></b>';
                 //counter.innerHTML = '<a href="https://www.youtube.com/watch?v=SIesZP9HzW8">Ritari Ässä -musavideo</a>';
             }
         }
