@@ -60,7 +60,9 @@
     }
 
 
-
+    .published a, .published a:hover, .published a:active {
+        color: white;
+    }
 
     #julkaisu {
         position: relative;
@@ -75,16 +77,17 @@
 <body>
 
 <div id="julkaisu">
-    SEURAAVAAN JULKAISUUN:<br>
+    <div id="julkaisuun">SEURAAVAAN JULKAISUUN:</div>
     <div id="counter">
     </div>
 
     <script>
         let publishTime = new Date('2018-05-03T17:00:00.000Z');
+        //publishTime = new Date(Date.now() + 2000);
          //publishTime = new Date('2018-04-24T18:15:00.000Z');
         function updateTime() {
             let diffMilliseconds = publishTime - new Date();
-            let secs = (diffMilliseconds / 1000 | 0) + 1;
+            let secs = (diffMilliseconds / 1000 + 1) | 0;
 
             let isInFuture = secs >= 0;
 
@@ -106,7 +109,10 @@
             if (isInFuture) {
                 counter.innerHTML = strings.join(' ');
             } else {
-                counter.innerHTML = 'Päivitä tämä sivu';
+                julkaisuun.textContent = 'OLKAA HYVÄT:';
+                counter.classList.add('published');
+                counter.innerHTML = '<a href="./index.html">Ritari Ässä -musavideo (päivitä sivu)</a>';
+                //counter.innerHTML = '<a href="https://www.youtube.com/watch?v=SIesZP9HzW8">Ritari Ässä -musavideo</a>';
             }
         }
         updateTime();
